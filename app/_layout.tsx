@@ -1,33 +1,28 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import {
-  Icon,
-  Label,
-  NativeTabs,
-  VectorIcon,
-} from "expo-router/unstable-native-tabs";
-import { Platform } from "react-native";
+import { isLiquidGlassAvailable } from "expo-glass-effect";
+import { Stack } from "expo-router";
 
 export default function TabLayout() {
+  const isGlassAvailable = isLiquidGlassAvailable();
   return (
-    <NativeTabs>
-      <NativeTabs.Trigger name="home">
-        <Label>홈</Label>
-        {Platform.select({
-          ios: <Icon sf="house.fill" />,
-          android: (
-            <Icon src={<VectorIcon family={MaterialIcons} name="home" />} />
-          ),
-        })}
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="my">
-        <Label>내 정보</Label>
-        {Platform.select({
-          ios: <Icon sf="person.fill" />,
-          android: (
-            <Icon src={<VectorIcon family={MaterialIcons} name="person" />} />
-          ),
-        })}
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <Stack initialRouteName="(tabs)">
+      <Stack.Screen
+        name="(tabs)"
+        options={{
+          headerShown: false,
+          title: "홈",
+        }}
+      />
+      <Stack.Screen
+        name="webview"
+        options={{
+          headerTransparent: true,
+          headerTintColor: "black",
+          headerLargeStyle: { backgroundColor: "transparent" },
+          headerBlurEffect: isGlassAvailable
+            ? undefined
+            : "systemMaterialLight",
+        }}
+      />
+    </Stack>
   );
 }
