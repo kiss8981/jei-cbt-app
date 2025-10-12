@@ -1,6 +1,5 @@
 import { StackActions, useNavigation } from "@react-navigation/native";
 import React from "react"; // useLayoutEffect를 import
-import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView, WebViewMessageEvent } from "react-native-webview";
 
 // 웹뷰에서 title을 추출하여 Native로 전달하는 JavaScript
@@ -94,15 +93,13 @@ export default function WebViewContainer({ baseURL }: { baseURL: string }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <WebView
-        allowsBackForwardNavigationGestures={true}
-        bounces={false}
-        source={{ uri: baseURL }}
-        onMessage={requestOnMessage}
-        injectedJavaScript={injectedJavaScript} // JavaScript 주입
-        style={{ flex: 1 }}
-      />
-    </SafeAreaView>
+    <WebView
+      allowsBackForwardNavigationGestures={true}
+      bounces={false}
+      source={{ uri: baseURL }}
+      onMessage={requestOnMessage}
+      injectedJavaScript={injectedJavaScript} // JavaScript 주입
+      style={{ flex: 1 }}
+    />
   );
 }
