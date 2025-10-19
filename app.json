@@ -12,7 +12,8 @@
       "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false
-      }
+      },
+      "bundleIdentifier": "com.codest.jeicbt"
     },
     "android": {
       "adaptiveIcon": {
@@ -46,6 +47,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "98ae4607-72b6-4a02-8b9a-aa37a9af2562"
+      }
     }
   }
 }
