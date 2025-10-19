@@ -1,5 +1,7 @@
+import { useAuth } from "@/hooks/useAuth";
+import { WebviewEventMessage } from "@/types/webview/event";
 import { StackActions, useNavigation } from "@react-navigation/native";
-import React from "react"; // useLayoutEffect를 import
+import React, { useLayoutEffect } from "react"; // useLayoutEffect를 import
 import { WebView, WebViewMessageEvent } from "react-native-webview";
 
 // 웹뷰에서 title을 추출하여 Native로 전달하는 JavaScript
@@ -32,6 +34,7 @@ const injectedJavaScript = `
 
 export default function WebViewContainer({ baseURL }: { baseURL: string }) {
   const navigation = useNavigation();
+  const { saveToken, deleteToken, getToken } = useAuth();
 
   // 헤더 타이틀을 업데이트하는 함수를 useLayoutEffect 내에서 사용하기 위해 별도로 정의
   const setHeaderTitle = React.useCallback(
@@ -43,9 +46,13 @@ export default function WebViewContainer({ baseURL }: { baseURL: string }) {
     [navigation]
   );
 
+  useLayoutEffect(() => {
+    setHeaderTitle("");
+  }, []);
+
   const requestOnMessage = (event: WebViewMessageEvent) => {
     try {
-      const message = JSON.parse(event.nativeEvent.data);
+      const message = JSON.parse(event.nativeEvent.data) as WebviewEventMessage;
       if (message.type === "ROUTER_EVENT") {
         const { method, path, screenName, data } = message;
         switch (method) {
@@ -86,6 +93,15 @@ export default function WebViewContainer({ baseURL }: { baseURL: string }) {
       } else if (message.type === "TITLE_UPDATE" && message.title) {
         // 웹뷰에서 제목을 수신하면 헤더 타이틀 업데이트
         setHeaderTitle(message.title);
+      } else if (message.type === "AUTH_EVENT") {
+        const { accessToken, refreshToken, method } = message;
+        if (method == "LOGIN" || method == "REFRESH_TOKEN") {
+          console.log("Tokens saved from WebView", message);
+
+          saveToken(accessToken!, refreshToken!);
+        } else if (method == "LOGOUT") {
+          deleteToken();
+        }
       }
     } catch (err) {
       console.warn("Invalid message format", err);
@@ -96,10 +112,13 @@ export default function WebViewContainer({ baseURL }: { baseURL: string }) {
     <WebView
       allowsBackForwardNavigationGestures={true}
       bounces={false}
-      source={{ uri: baseURL }}
+      source={{
+        uri: baseURL,
+      }}
       onMessage={requestOnMessage}
       injectedJavaScript={injectedJavaScript} // JavaScript 주입
       style={{ flex: 1 }}
+      sharedCookiesEnabled
     />
   );
 }
